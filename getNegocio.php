@@ -8,7 +8,44 @@ require('conexion.php');
 
 class Negocio extends conexion {
     function getNegocio($N_latitude, $S_latitude, $N_longitude, $S_longitude){
-        $query = $this -> getConexion() -> query("SELECT nombre, correo, url, latitud, longitud, description_negocio, dias_apertura, hora_apertura, nombre_categoria FROM negocio, persona, categoria WHERE id_persona = persona_id AND id_categoria = categoria_id AND ( latitud > $S_latitude AND latitud < $N_latitude ) AND ( longitud > $S_longitude AND longitud < $N_longitude);");
+        $query = $this -> getConexion() -> query("SELECT 
+        persona.nombre AS nombre, 
+        persona.correo AS correo,
+        persona.url AS url, 
+        persona.latitud AS latitud, 
+        persona.longitud AS longitud, 
+        negocio.description_negocio AS description_negocio, 
+        negocio.dias_apertura AS dias_apertura, 
+        negocio.hora_apertura AS hora_apertura, 
+        categoria.nombre_categoria AS nombre_categoria, 
+        negocio.image_negocio AS image_negocio, 
+        negocio.id_negocio AS id_negocio, 
+        ROUND(COALESCE(AVG(reseñas.calificacion_reseña), 0), 1) AS calificacion 
+
+        FROM 
+        local_market.negocio JOIN local_market.persona ON negocio.persona_id = persona.id_persona 
+        JOIN local_market.categoria ON negocio.categoria_id = categoria.id_categoria 
+        LEFT JOIN local_market.reseñas ON negocio.id_negocio = reseñas.negocio_id 
+
+        WHERE 
+        persona.latitud > $S_latitude 
+        AND persona.latitud < $N_latitude 
+        AND persona.longitud > $S_longitude 
+        AND persona.longitud < $N_longitude
+
+        GROUP BY 
+        negocio.id_negocio, 
+        persona.nombre, 
+        persona.correo, 
+        persona.url, 
+        persona.latitud, 
+        persona.longitud, 
+        negocio.description_negocio, 
+        negocio.dias_apertura, 
+        negocio.hora_apertura, 
+        categoria.nombre_categoria, 
+        negocio.image_negocio;");
+
         $request['negocio'] = array();
         if($query -> num_rows > 0){
             for ($i = 0; $i < $query -> num_rows; $i++) { 
@@ -19,10 +56,13 @@ class Negocio extends conexion {
                     $row['url'],
                     strval($row['latitud']),
                     strval($row['longitud']),
-                    $row['description_negocio'],
+                    $row['description_negocio'],//5
                     $row['dias_apertura'],
                     $row['hora_apertura'],
-                    $row['nombre_categoria']
+                    $row['nombre_categoria'],
+                    $row['image_negocio'],
+                    $row['id_negocio'],
+                    strval($row['calificacion'])
                 );
                 array_push($request['negocio'], $item);
             }}
