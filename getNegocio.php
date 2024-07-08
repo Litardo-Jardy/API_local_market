@@ -1,10 +1,5 @@
 <?php
-header('Content-Type: application/json');
-header("Access-Control-Allow-Origin: *"); 
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); 
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-
-require('conexion.php');
+require('header.php');
 
 class Negocio extends conexion {
     function getNegocio($N_latitude, $S_latitude, $N_longitude, $S_longitude){
