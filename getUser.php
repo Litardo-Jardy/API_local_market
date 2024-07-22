@@ -3,7 +3,22 @@ require('header.php');
 
 class User extends conexion {
     function getUser($user, $pass, $id_user){
-        $query = $this -> getConexion() -> query("SELECT id_persona AS id, nombre, correo, pass, latitud, longitud, tipo, url FROM persona WHERE (correo = '$user' AND pass = '$pass') OR id_persona = $id_user");
+        $query = $this -> getConexion() -> query("SELECT 
+        p.id_persona AS id, 
+        p.nombre As nombre, 
+        p.correo AS correo, 
+        p.pass AS pass, 
+        p.latitud AS latitud, 
+        p.longitud AS longitud, 
+        p.tipo AS tipo, 
+        p.url AS url, 
+        COALESCE(n.id_negocio, 0) AS negocio 
+        
+        FROM persona p 
+        LEFT JOIN negocio n 
+        ON p.id_persona = n.persona_id 
+        WHERE (p.correo = '$user' AND p.pass = '$pass') OR p.id_persona = $id_user");
+
         $request['user'] = array();
         if($query -> num_rows > 0){
             for ($i = 0; $i < $query -> num_rows; $i++) { 
@@ -16,7 +31,8 @@ class User extends conexion {
                     $row['latitud'],
                     $row['longitud'],
                     $row['tipo'],
-                    $row['url']
+                    $row['url'],
+                    $row['negocio']
                 );
                 array_push($request['user'], $item);
             }
