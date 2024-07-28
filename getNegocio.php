@@ -2,15 +2,17 @@
 require('header.php');
 
 class Negocio extends conexion {
-    function getNegocio($N_latitude, $S_latitude, $N_longitude, $S_longitude){
+    function getNegocio($N_latitude, $S_latitude, $N_longitude, $S_longitude, $id){
         $query = $this -> getConexion() -> query("SELECT 
         persona.nombre AS nombre, 
         persona.correo AS correo,
         persona.url AS url, 
+        persona.pass AS pass,
         persona.latitud AS latitud, 
         persona.longitud AS longitud, 
         negocio.description_negocio AS description_negocio, 
-        negocio.dias_apertura AS dias_apertura, 
+        negocio.dias_apertura AS dias_apertura,
+        negocio.referencia_negocio AS referencia, 
         negocio.hora_apertura AS hora_apertura, 
         categoria.nombre_categoria AS nombre_categoria, 
         negocio.image_negocio AS image_negocio, 
@@ -23,10 +25,14 @@ class Negocio extends conexion {
         LEFT JOIN local_market.reseñas ON negocio.id_negocio = reseñas.negocio_id 
 
         WHERE 
-        persona.latitud > $S_latitude 
+        (persona.latitud > $S_latitude 
         AND persona.latitud < $N_latitude 
         AND persona.longitud > $S_longitude 
-        AND persona.longitud < $N_longitude
+        AND persona.longitud < $N_longitude)
+        
+        OR
+        
+        negocio.persona_id = $id
 
         GROUP BY 
         negocio.id_negocio, 
@@ -35,9 +41,11 @@ class Negocio extends conexion {
         persona.url, 
         persona.latitud, 
         persona.longitud, 
+        persona.pass,
         negocio.description_negocio, 
         negocio.dias_apertura, 
         negocio.hora_apertura, 
+        negocio.referencia_negocio,
         categoria.nombre_categoria, 
         negocio.image_negocio;");
 
@@ -57,7 +65,9 @@ class Negocio extends conexion {
                     $row['nombre_categoria'],
                     $row['image_negocio'],
                     $row['id_negocio'],
-                    strval($row['calificacion'])
+                    strval($row['calificacion']),
+                    $row['referencia'],
+                    $row['pass']
                 );
                 array_push($request['negocio'], $item);
             }}
@@ -71,7 +81,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $S_latitude = $json_data['S_latitude'];
     $N_longitude = $json_data['N_longitude'];
     $S_longitude = $json_data['S_longitude'];
+    $id = $json_data['id'];
  
     $getData = new Negocio();
-    echo $getData -> getNegocio($N_latitude, $S_latitude, $N_longitude, $S_longitude);}
+    echo $getData -> getNegocio($N_latitude, $S_latitude, $N_longitude, $S_longitude, $id);}
 ?>

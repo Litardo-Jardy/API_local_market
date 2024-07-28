@@ -2,7 +2,7 @@
 require('header.php');
 
 class UpdateUser extends conexion {
-    function updateUser($name, $email, $pass, $latitude, $longitude, $image, $id ){
+    function updateUser($name, $email, $pass, $latitude, $longitude, $image, $id){
       $query = $this -> getConexion() -> prepare("UPDATE 
         persona SET 
         nombre = '$name', 
@@ -12,6 +12,7 @@ class UpdateUser extends conexion {
         longitud ='$longitude', 
         url ='$image'
         WHERE id_persona = $id");
+
         $query->execute();}}
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -23,7 +24,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
    $email = $json_data['email'];
    $pass = $json_data['pass'];
    $image = $json_data['image'];
+   $latitude = $json_data['latitude'];
+   $longitude = $json_data['longitude'];
 
    $add = new UpdateUser();
-   $add -> updateUser($name, $email, $pass, $latitude, $longitude, $image, $id);}
+   echo $add -> updateUser($name, $email, $pass, $latitude, $longitude, $image, $id);}
 ?>
