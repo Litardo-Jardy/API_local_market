@@ -8,12 +8,19 @@ class UpdateUser extends conexion {
         nombre = '$name', 
         correo ='$email', 
         pass ='$pass',
-        latitud ='$latitude', 
-        longitud ='$longitude', 
+        latitud =$latitude, 
+        longitud =$longitude, 
         url ='$image'
         WHERE id_persona = $id");
 
-        $query->execute();}}
+        $query->execute();
+        if ($query->execute()) {
+          echo json_encode(['status' => 'success', 'message' => 'User updated successfully']);
+      } else {
+          $errorInfo = $query->errorInfo();
+          echo json_encode(['status' => 'error', 'message' => 'Failed to update user', 'error' => $errorInfo]);
+      }
+      }}
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
    $data = file_get_contents('php://input');
@@ -28,5 +35,5 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
    $longitude = $json_data['longitude'];
 
    $add = new UpdateUser();
-   echo $add -> updateUser($name, $email, $pass, $latitude, $longitude, $image, $id);}
+  $add -> updateUser($name, $email, $pass, $latitude, $longitude, $image, $id);}
 ?>
