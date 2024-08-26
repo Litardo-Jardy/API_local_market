@@ -13,7 +13,10 @@ class Register extends conexion{
         $idCategoria = $categoriaId['id_categoria'];
 
         $query = $this -> getConexion() -> prepare("INSERT INTO negocio(description_negocio, hora_apertura, dias_apertura, referencia_negocio, persona_id, categoria_id) VALUES ('$descripcion', '$horaApertura', '$diasApertura', '$referencia', $personaId, $idCategoria)");
-        $query->execute();}}
+        $query->execute();
+        
+        return $this->getConexion() -> insert_id;
+    }}
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $data = file_get_contents('php://input');
@@ -31,7 +34,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $descripcion = $json_data['descripcion'];
     $categoria = $json_data['categoria'];
 
- 
     $register = new Register();
-    $register -> registerNegocio($nombre, $correo, $pass, $latitud, $longitud, $tipo, $referencia, $horaApertura, $diasApertura, $descripcion, $categoria);}
+    $id = $register -> registerNegocio($nombre, $correo, $pass, $latitud, $longitud, $tipo, $referencia, $horaApertura, $diasApertura, $descripcion, $categoria);}
+
+    if ($id !== false) {
+        echo json_encode(['id' => $id]);
+    } else {
+        echo json_encode(['error' => 'Failed to register user']);}
 ?>
